@@ -1,0 +1,4 @@
+<!--index.wxml-->
+<view class="container">
+  <button class="upload" bind:tap="upload" size="mini">上传</button>
+</view>
