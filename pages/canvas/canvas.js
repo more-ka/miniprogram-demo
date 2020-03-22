@@ -14,10 +14,10 @@ Page({
     imgProportion: 0.6, // 图片占canvas画布宽度百分比, 不建议随意修改
     imgToTop: 100 // 图片到canvas顶部的距离
   },
-  onLoad: function(options) {
+  onLoad: function (options) {
     var that = this
     var sysInfo = wx.getSystemInfo({
-      success: function(res) {
+      success: function (res) {
         that.setData({
           canvasWidth: res.windowWidth,
           canvasHeight: res.windowHeight * 0.8
@@ -29,7 +29,7 @@ Page({
       }
     })
   },
-  start: function() {
+  start: function () {
     let that = this
     let ctx = wx.createCanvasContext('myCanvas')
     that.setData({
@@ -39,7 +39,7 @@ Page({
     // this.tempFilePath()
   },
   //画背景图
-  addImage: function(ctx) {
+  addImage: function (ctx) {
     var context = wx.createContext();
     var that = this;
     let imgInfo = that.data.imgInfo
@@ -49,19 +49,21 @@ Page({
       success(res) {
         wx.getImageInfo({
           src: res.tempFilePaths[0],
-          success: function(response) {
+          success: function (response) {
             console.log(JSON.stringify(response));
             that.setData({
-              imgInfo: response
+              imgInfo: response,
+              path: res.tempFilePaths[0]
             });
-            path = res.tempFilePaths[0]
-            let imgWidth = that.data.canvasWidth * that.data.imgProportion
-            let imgHeight = response.height / response.width * imgWidth
-            console.log('imgwidth', imgWidth, 'imgHeight', imgHeight)
-            let height = that.data.canvasWidth * imgInfo.width
-            ctx.drawImage(path, 0, 0, response.width, response.height, that.data.leftMargin, that.data.imgToTop, imgWidth, imgHeight)
-            ctx.draw()
+            // path = res.tempFilePaths[0]
+            // let imgWidth = that.data.canvasWidth * that.data.imgProportion
+            // let imgHeight = response.height / response.width * imgWidth
+            // console.log('imgwidth', imgWidth, 'imgHeight', imgHeight)
+            // let height = that.data.canvasWidth * imgInfo.width
+            // ctx.drawImage(path, 0, 0, response.width, response.height, that.data.leftMargin, that.data.imgToTop, imgWidth, imgHeight)
+            // ctx.draw()
             // that.makeCanvas(url);
+            that.drawImage(ctx)
           }
         })
       }
@@ -76,8 +78,19 @@ Page({
     // this.addSalary()
     // ctx.draw()
   },
+  // 绘制图片
+  drawImage(ctx) {
+    let that = this
+    let imgInfo = that.data.imgInfo
+    let path = that.data.path
+    let imgWidth = that.data.canvasWidth * that.data.imgProportion
+    let imgHeight = imgInfo.height / imgInfo.width * imgWidth
+    console.log('imgwidth', imgWidth, 'imgHeight', imgHeight)
+    ctx.drawImage(path, 0, 0, imgInfo.width, imgInfo.height, that.data.leftMargin, that.data.imgToTop, imgWidth, imgHeight)
+    ctx.draw()
+  },
   //画标题
-  addTitle: function(ctx) {
+  addTitle: function (ctx) {
     var str = this.data.title
     ctx.font = 'normal bold 20px sans-serif';
     ctx.setTextAlign('center'); // 文字居中
@@ -85,7 +98,7 @@ Page({
     ctx.fillText(str, this.data.canvasWidth / 2, 65)
   },
   // 画返费方式
-  addRtype: function() {
+  addRtype: function () {
     var str = this.data.rtype
     ctx.setFontSize(16)
     ctx.setFillStyle("#ff4200");
@@ -93,7 +106,7 @@ Page({
     ctx.fillText(str, leftMargin * 0.35, topMargin * 0.4)
   },
   // 画返费金额
-  addRmoney: function() {
+  addRmoney: function () {
     var str = this.data.rmoney
     ctx.setFontSize(16)
     ctx.setFillStyle("#222");
@@ -101,7 +114,7 @@ Page({
     ctx.fillText(str, leftMargin * 0.35, topMargin * 0.5)
   },
   // 画薪资
-  addSalary: function() {
+  addSalary: function () {
     var str = this.data.salary
     ctx.setFontSize(16)
     ctx.setFillStyle("#222");
@@ -111,7 +124,7 @@ Page({
   /**
    * 用户点击右上角分享
    */
-  onShareAppMessage: function(res) {
+  onShareAppMessage: function (res) {
     // return eventHandler接收到的分享参数
     return {
       title: this.data.title,
@@ -120,7 +133,7 @@ Page({
     };
   },
   //导出图片
-  tempFilePath: function() {
+  tempFilePath: function () {
     let that = this;
     wx.canvasToTempFilePath({
       canvasId: 'myCanvas',
