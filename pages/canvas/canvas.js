@@ -1,9 +1,7 @@
 // pages/canvas/canvas.js
 Page({
-
   data: {
-    title: '标题',
-    salary: '500-8000元/月',
+    title: 'canvas绘制图片',
     canvasWidth: '', // canvas宽度
     canvasHeight: '', // canvas高度
     imagePath: '', // 分享的图片路径
@@ -11,7 +9,7 @@ Page({
     topMargin: 0,
     imgInfo: {},
     ctx: [1, 2, 3],
-    imgProportion: 0.6, // 图片占canvas画布宽度百分比, 不建议随意修改
+    imgProportion: 0.8, // 图片占canvas画布宽度百分比, 不建议随意修改
     imgToTop: 100 // 图片到canvas顶部的距离
   },
   onLoad: function (options) {
@@ -32,13 +30,14 @@ Page({
   start: function () {
     let that = this
     let ctx = wx.createCanvasContext('myCanvas')
+    ctx.setFillStyle('#f8f8f8')
+    ctx.fillRect(0, 0, that.data.canvasWidth, that.data.canvasHeight)
     that.setData({
       ctx: ctx
     })
     this.addImage(ctx)
-    // this.tempFilePath()
   },
-  //画背景图
+  // 选择图片
   addImage: function (ctx) {
     var context = wx.createContext();
     var that = this;
@@ -50,33 +49,17 @@ Page({
         wx.getImageInfo({
           src: res.tempFilePaths[0],
           success: function (response) {
-            console.log(JSON.stringify(response));
             that.setData({
               imgInfo: response,
               path: res.tempFilePaths[0]
-            });
-            // path = res.tempFilePaths[0]
-            // let imgWidth = that.data.canvasWidth * that.data.imgProportion
-            // let imgHeight = response.height / response.width * imgWidth
-            // console.log('imgwidth', imgWidth, 'imgHeight', imgHeight)
-            // let height = that.data.canvasWidth * imgInfo.width
-            // ctx.drawImage(path, 0, 0, response.width, response.height, that.data.leftMargin, that.data.imgToTop, imgWidth, imgHeight)
-            // ctx.draw()
+            })
             // that.makeCanvas(url);
             that.drawImage(ctx)
           }
         })
       }
     })
-
-    //将模板图片绘制到canvas,在开发工具中drawImage()函数有问题，不显示图片
-    //不知道是什么原因，手机环境能正常显示
-
     this.addTitle(ctx)
-    // this.addRtype()
-    // this.addRmoney()
-    // this.addSalary()
-    // ctx.draw()
   },
   // 绘制图片
   drawImage(ctx) {
@@ -92,61 +75,110 @@ Page({
   //画标题
   addTitle: function (ctx) {
     var str = this.data.title
-    ctx.font = 'normal bold 20px sans-serif';
+    ctx.font = 'normal bold 16px sans-serif';
     ctx.setTextAlign('center'); // 文字居中
     ctx.setFillStyle("#222222");
-    ctx.fillText(str, this.data.canvasWidth / 2, 65)
-  },
-  // 画返费方式
-  addRtype: function () {
-    var str = this.data.rtype
-    ctx.setFontSize(16)
-    ctx.setFillStyle("#ff4200");
-    ctx.setTextAlign('left');
-    ctx.fillText(str, leftMargin * 0.35, topMargin * 0.4)
-  },
-  // 画返费金额
-  addRmoney: function () {
-    var str = this.data.rmoney
-    ctx.setFontSize(16)
-    ctx.setFillStyle("#222");
-    ctx.setTextAlign('left');
-    ctx.fillText(str, leftMargin * 0.35, topMargin * 0.5)
-  },
-  // 画薪资
-  addSalary: function () {
-    var str = this.data.salary
-    ctx.setFontSize(16)
-    ctx.setFillStyle("#222");
-    ctx.setTextAlign('left');
-    ctx.fillText(str, leftMargin * 0.35, topMargin * 0.61)
+    ctx.fillText(str, this.data.canvasWidth / 2, 45)
   },
   /**
    * 用户点击右上角分享
    */
   onShareAppMessage: function (res) {
     // return eventHandler接收到的分享参数
+    console.log('fengxinagshijian')
+    console.log('share',this.data.path,this.data.title)
     return {
       title: this.data.title,
-      path: '/pages/test/test',
-      imageUrl: this.data.imagePath
+      path: '/pages/canvas/canvas',
+      imageUrl: this.data.path
     };
   },
-  //导出图片
-  tempFilePath: function () {
+  //点击下载按钮保存canvas图片
+  downloadCanvas: function () {
     let that = this;
     wx.canvasToTempFilePath({
+      x: 0,
+      y: 0,
+      width: that.canvasWidth * 2,
+      height: that.canvasWidth * 2,
+      destWidth: that.canvasWidth * 2,
+      destHeight: that.canvasHeight * 2,
       canvasId: 'myCanvas',
       success: function success(res) {
-        wx.saveFile({
-          tempFilePath: res.tempFilePath,
-          success: function success(res) {
-            that.setData({
-              imagePath: res.savedFilePath
-            });
+        wx.saveImageToPhotosAlbum({
+          filePath: res.tempFilePath,
+          success(res) { 
+            console.log(res,'保存')
           }
-        });
+        })
+        // wx.downloadFile({
+        //   tempFilePath: res.tempFilePath,
+        //   success: function success(res) {
+        //     that.setData({
+        //       imagePath: res.savedFilePath
+        //     });
+        //     console.log(res.savedFilePath)
+
+        //   }
+        // });
       }
     });
   },
+  // 分享图片
+  share(){
+
+  },
+  saveImg() {
+    let that = this;
+    // 获取用户是否开启用户授权相册
+    wx.getSetting({
+      success(res) {
+        // 如果没有则获取授权
+        if (!res.authSetting['scope.writePhotosAlbum']) {
+          wx.authorize({
+            scope: 'scope.writePhotosAlbum',
+            success() {
+              wx.saveImageToPhotosAlbum({
+                filePath: that.data.shareImg,
+                success() {
+                  wx.showToast({
+                    title: '保存成功'
+                  })
+                },
+                fail() {
+                  wx.showToast({
+                    title: '保存失败',
+                    icon: 'none'
+                  })
+                }
+              })
+            },
+            fail() {
+              // 如果用户拒绝过或没有授权，则再次打开授权窗口
+              //（ps：微信api又改了现在只能通过button才能打开授权设置，以前通过openSet就可打开，下面有打开授权的button弹窗代码）
+              that.setData({
+                openSet: true
+              })
+            }
+          })
+        } else {
+          // 有则直接保存
+          wx.saveImageToPhotosAlbum({
+            filePath: that.data.shareImg,
+            success() {
+              wx.showToast({
+                title: '保存成功'
+              })
+            },
+            fail() {
+              wx.showToast({
+                title: '保存失败',
+                icon: 'none'
+              })
+            }
+          })
+        }
+      }
+    })
+  }
 })

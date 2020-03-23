@@ -1,1 +1,19 @@
 /* pages/canvas/canvas.wxss */
+button,canvas{
+  margin: 0;
+  padding: 0;
+}
+.container{
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  padding: 12px;
+}
+.start{
+}
+.share{
+}
+
+#myCancas{
+  box-sizing: border-box;
+}

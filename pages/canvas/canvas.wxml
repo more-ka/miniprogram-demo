@@ -1,4 +1,10 @@
 <!--pages/canvas/canvas.wxml-->
-<button bind:tap="start">选择图片</button>
-<canvas style='width:{{canvasWidth}}px;height:{{canvasHeight}}px;border: 1px solid red;' canvas-id='myCanvas'></canvas>
-<button open-type='share'>分享</button>
+<view>
+  <view class="container">
+    <button bind:tap="start" class="start" size="mini">选择图片</button>
+    <button bind:tap="downloadCanvas" class="downloadCanvas" size="mini">下载</button>
+    <button bind:tap="share" class="share" size="mini">分享</button>
+  </view>
+  <text>canvas区域</text>
+  <canvas style='width:{{canvasWidth}}px;height:{{canvasHeight}}px;border: 1px solid grey;' canvas-id='myCanvas'></canvas>
+</view>
