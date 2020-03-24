@@ -4,7 +4,9 @@
     <button bind:tap="start" class="start" size="mini">选择图片</button>
     <button bind:tap="downloadCanvas" class="downloadCanvas" size="mini">下载</button>
     <button bind:tap="share" class="share" size="mini">分享</button>
+    <!-- 分享图片功能 -->
   </view>
   <text>canvas区域</text>
   <canvas style='width:{{canvasWidth}}px;height:{{canvasHeight}}px;border: 1px solid grey;' canvas-id='myCanvas'></canvas>
+  <image v-if="previewImage" :src="{{canvasImage}}"></image>
 </view>
